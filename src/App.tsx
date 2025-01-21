@@ -71,12 +71,12 @@ function App() {
               <Card sx={{ maxWidth: 345 }}>
                 <CardMedia
                   component="img"
-                  sx={{ height: 200, objectFit: 'contain' }}
+                  sx={{ height: '50%', objectFit: 'contain' }}
                   image={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${
                     index + 1
                   }.png`}
                 />
-                <CardContent>
+                <CardContent component='div' sx={{ height: '50%' }}>
                   <Typography gutterBottom variant="h5" component="div">
                     {pokemon.name.replace(
                       pokemon.name[0],
@@ -88,8 +88,7 @@ function App() {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button size="small">Share</Button>
-                  <Button size="small">Learn More</Button>
+                  <Button size="small">Details</Button>
                 </CardActions>
               </Card>
             </Grid>
