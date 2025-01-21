@@ -67,12 +67,12 @@ function App() {
           columns={{ xs: 4, sm: 8, md: 12 }}
         >
           {allPokemon.map((pokemon: Pokemon, index) => (
-            <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
-              <Card sx={{ maxWidth: 345 }}>
+            <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }} >
+              <Card component="div" sx={{ maxWidth: 345, display: 'flex-column', justifyContent: 'center', alignItems: 'center' }}>
                 <CardMedia
                   component="img"
                   sx={{ height: '50%', objectFit: 'contain' }}
-                  image={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${
+                  image={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
                     index + 1
                   }.png`}
                 />
