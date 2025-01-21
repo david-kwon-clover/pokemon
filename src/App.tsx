@@ -3,31 +3,31 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import Grid from "@mui/material/Grid2";
-import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
+import SearchIcon from "@mui/icons-material/Search";
+import HeroBackground from "./assets/pikachu-background.jpeg";
 import { useEffect, useState } from "react";
-
-
+import Grid from "@mui/material/Grid2";
+import {
+  TextField,
+  Box,
+  Typography,
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Button,
+  InputAdornment,
+} from "@mui/material";
 
 type Pokemon = {
   name: string;
   url: string;
 };
 
-type PokemonDetails = {
-  types: Array<{ slot: number, type: { name: string, url: string } }>;
-};
-
 function App() {
   const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
-  const [pokemonDetails, setPokemonDetails] = useState<PokemonDetails[]>([]);
-  const [error, setError] = useState("")
+  const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchPokemon = async () => {
     try {
@@ -41,9 +41,6 @@ function App() {
       }
       const data = await response.json();
       setAllPokemon(data.results);
-      const detailedResponses = await Promise.all(allPokemon.map((pokemon: Pokemon) => fetch(pokemon.url)));
-      const detailedData: PokemonDetails[] = await Promise.all(detailedResponses.map((response) => response.json()));
-      setPokemonDetails(detailedData);
     } catch (error) {
       error instanceof Error && setError(error.message);
     }
@@ -53,20 +50,84 @@ function App() {
     fetchPokemon();
   }, []);
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value === "") {
+      fetchPokemon();
+    }
+    setSearchQuery(e.target.value);
+    const filteredPokemon = allPokemon.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(e.target.value)
+    );
+    setAllPokemon(filteredPokemon);
+  };
+
+  const scrollToPokemon = () => {
+    const pokemonSection = document.getElementById("pokemon-section");
+    pokemonSection?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <main>
-      <h1>Browse the Original 151 Pokemon</h1>
+      <Box
+        component={"section"}
+        sx={{
+          height: "100vh",
+          width: "100vw",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          background: `radial-gradient(circle, rgba(0,0,0,0.2), rgba(0,0,0,0.9)), url(${HeroBackground})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          color: "white",
+        }}
+      >
+        <Typography
+          variant="h2"
+          component="h1"
+          sx={{
+            fontWeight: "bold",
+            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.7)",
+            marginY: "1rem",
+          }}
+        >
+          Browse the Original 151 Pokemon
+        </Typography>
+        <Button variant="contained" sx={{ backgroundColor: "red", width: "20%", height: "10%", fontSize: "large"}} onClick={scrollToPokemon}>Explore</Button>
+      </Box>
       {error ? (
         <h2>{error}</h2>
       ) : (
-        <Box sx={{ flexGrow: 1 }}>
+        <Box id="pokemon-section" sx={{ flexGrow: 1, paddingX: "2rem", paddingY: "1rem" }}>
+          <TextField
+            sx={{
+              backgroundColor: "white",
+              borderRadius: "0.5rem",
+              marginY: "1rem",
+              width: "30%",
+            }}
+            placeholder="Search for a Pokemon"
+            onChange={handleSearch}
+            value={searchQuery}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
           <Grid
             container
             spacing={{ xs: 2, md: 3 }}
             columns={{ xs: 4, sm: 8, md: 12 }}
           >
             {allPokemon.map((pokemon: Pokemon, index) => (
-              <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
+              <Grid key={index} size={{ xs: 5, sm: 4, md: 3, lg: 2 }}>
                 <Card
                   component="div"
                   sx={{
@@ -79,7 +140,7 @@ function App() {
                     component="img"
                     sx={{ height: "50%", objectFit: "contain" }}
                     image={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
-                      index + 1
+                      pokemon.url.split("/")[6]
                     }.png`}
                   />
                   <CardContent component="div" sx={{ height: "50%" }}>
@@ -88,12 +149,6 @@ function App() {
                         pokemon.name[0],
                         pokemon.name[0].toUpperCase()
                       )}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
-                      Type(s): {pokemonDetails[index]?.types.map((type) => type.type.name).join(", ")}
                     </Typography>
                   </CardContent>
                   <CardActions sx={{ justifyContent: "center" }}>
